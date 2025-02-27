@@ -117,19 +117,19 @@
             <h2>Density Adjustment Calculator</h2>
             <div class="input-group">
                 <label>Original Volume:</label>
-                <input type="number" id="originalVolume" placeholder="m³">
+                <input type="number" inputmode="decimal" id="originalVolume" placeholder="m³">
             </div>
             <div class="input-group">
                 <label>Original Density:</label>
-                <input type="number" id="originalDensity" placeholder="kg/m³">
+                <input type="number" inputmode="decimal" id="originalDensity" placeholder="kg/m³">
             </div>
             <div class="input-group">
                 <label>Desired Density:</label>
-                <input type="number" id="desiredDensity" placeholder="kg/m³">
+                <input type="number" inputmode="decimal" id="desiredDensity" placeholder="kg/m³">
             </div>
             <div class="input-group">
                 <label>Additive Density:</label>
-                <input type="number" id="additiveDensity" placeholder="kg/m³">
+                <input type="number" inputmode="decimal" id="additiveDensity" placeholder="kg/m³">
             </div>
             <button onclick="calculateDensity()">Calculate</button>
             <div id="densityResult" class="result"></div>
@@ -148,15 +148,15 @@
             </div>
             <div class="input-group">
                 <label id="flowInput1Label">Flow Rate:</label>
-                <input type="number" id="flowInput1" placeholder="m³/min">
+                <input type="number" inputmode="decimal" id="flowInput1" placeholder="m³/min">
             </div>
             <div class="input-group">
                 <label id="flowInput2Label">Volume:</label>
-                <input type="number" id="flowInput2" placeholder="m³">
+                <input type="number" inputmode="decimal" id="flowInput2" placeholder="m³">
             </div>
             <div class="input-group">
                 <label id="flowInput3Label">Time:</label>
-                <input type="number" id="flowInput3" placeholder="minutes">
+                <input type="number" inputmode="decimal" id="flowInput3" placeholder="minutes">
             </div>
             <button onclick="calculateFlow()">Calculate</button>
             <div id="flowResult" class="result"></div>
@@ -167,15 +167,15 @@
             <h2>Drill Flow Volume Calculator</h2>
             <div class="input-group">
                 <label>Hole Diameter:</label>
-                <input type="number" id="holeDiameter" placeholder="inches">
+                <input type="number" inputmode="decimal" id="holeDiameter" placeholder="inches">
             </div>
             <div class="input-group">
                 <label>Pipe Diameter:</label>
-                <input type="number" id="pipeDiameter" placeholder="inches">
+                <input type="number" inputmode="decimal" id="pipeDiameter" placeholder="inches">
             </div>
             <div class="input-group">
                 <label>Length:</label>
-                <input type="number" id="length" placeholder="feet">
+                <input type="number" inputmode="decimal" id="length" placeholder="feet">
             </div>
             <button onclick="calculateDrill()">Calculate</button>
             <div id="drillResult" class="result"></div>
@@ -186,15 +186,15 @@
             <h2>Dual-Phase System Calculator</h2>
             <div class="input-group">
                 <label>Total Volume:</label>
-                <input type="number" id="totalVolume" placeholder="m³">
+                <input type="number" inputmode="decimal" id="totalVolume" placeholder="m³">
             </div>
             <div class="input-group">
                 <label>Oil Volume:</label>
-                <input type="number" id="oilVolume" placeholder="m³">
+                <input type="number" inputmode="decimal" id="oilVolume" placeholder="m³">
             </div>
             <div class="input-group">
                 <label>Total Salinity:</label>
-                <input type="number" id="totalSalinity" placeholder="ppm">
+                <input type="number" inputmode="decimal" id="totalSalinity" placeholder="ppm">
             </div>
             <button onclick="calculateDualPhase()">Calculate</button>
             <div id="dualPhaseResult" class="result"></div>

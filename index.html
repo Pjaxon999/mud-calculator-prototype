@@ -80,6 +80,13 @@
             background-color: #e8f5e9;
             border-radius: 4px;
             display: none;
+            white-space: pre-wrap;
+        }
+
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
         }
 
         @media (min-width: 600px) {
@@ -109,7 +116,7 @@
             <option value="density">Density Adjustment</option>
             <option value="flow">Flow Rate</option>
             <option value="drill">Drill Flow Volume</option>
-            <option value="dualPhase">Dual-Phase System (Water Phase Salinity)</option>
+            <option value="salinity">Oil-Water Phase Salinity</option>
         </select>
 
         <!-- Density Calculator -->
@@ -117,19 +124,19 @@
             <h2>Density Adjustment Calculator</h2>
             <div class="input-group">
                 <label>Original Volume:</label>
-                <input type="number" inputmode="decimal" id="originalVolume" placeholder="m³">
+                <input type="number" id="originalVolume" placeholder="m³" inputmode="decimal">
             </div>
             <div class="input-group">
                 <label>Original Density:</label>
-                <input type="number" inputmode="decimal" id="originalDensity" placeholder="kg/m³">
+                <input type="number" id="originalDensity" placeholder="kg/m³" inputmode="decimal">
             </div>
             <div class="input-group">
                 <label>Desired Density:</label>
-                <input type="number" inputmode="decimal" id="desiredDensity" placeholder="kg/m³">
+                <input type="number" id="desiredDensity" placeholder="kg/m³" inputmode="decimal">
             </div>
             <div class="input-group">
                 <label>Additive Density:</label>
-                <input type="number" inputmode="decimal" id="additiveDensity" placeholder="kg/m³">
+                <input type="number" id="additiveDensity" placeholder="kg/m³" inputmode="decimal">
             </div>
             <button onclick="calculateDensity()">Calculate</button>
             <div id="densityResult" class="result"></div>
@@ -148,15 +155,15 @@
             </div>
             <div class="input-group">
                 <label id="flowInput1Label">Flow Rate:</label>
-                <input type="number" inputmode="decimal" id="flowInput1" placeholder="m³/min">
+                <input type="number" id="flowInput1" placeholder="m³/min" inputmode="decimal">
             </div>
             <div class="input-group">
                 <label id="flowInput2Label">Volume:</label>
-                <input type="number" inputmode="decimal" id="flowInput2" placeholder="m³">
+                <input type="number" id="flowInput2" placeholder="m³" inputmode="decimal">
             </div>
             <div class="input-group">
                 <label id="flowInput3Label">Time:</label>
-                <input type="number" inputmode="decimal" id="flowInput3" placeholder="minutes">
+                <input type="number" id="flowInput3" placeholder="minutes" inputmode="decimal">
             </div>
             <button onclick="calculateFlow()">Calculate</button>
             <div id="flowResult" class="result"></div>
@@ -167,37 +174,49 @@
             <h2>Drill Flow Volume Calculator</h2>
             <div class="input-group">
                 <label>Hole Diameter:</label>
-                <input type="number" inputmode="decimal" id="holeDiameter" placeholder="inches">
+                <input type="number" id="holeDiameter" placeholder="inches" inputmode="decimal">
             </div>
             <div class="input-group">
                 <label>Pipe Diameter:</label>
-                <input type="number" inputmode="decimal" id="pipeDiameter" placeholder="inches">
+                <input type="number" id="pipeDiameter" placeholder="inches" inputmode="decimal">
             </div>
             <div class="input-group">
                 <label>Length:</label>
-                <input type="number" inputmode="decimal" id="length" placeholder="feet">
+                <input type="number" id="length" placeholder="feet" inputmode="decimal">
             </div>
             <button onclick="calculateDrill()">Calculate</button>
             <div id="drillResult" class="result"></div>
         </div>
 
-        <!-- Dual-Phase System Calculator -->
-        <div id="dualPhaseCalc" class="calculator">
-            <h2>Dual-Phase System Calculator</h2>
+        <!-- Oil-Water Salinity Calculator -->
+        <div id="salinityCalc" class="calculator">
+            <h2>Oil-Water Phase Salinity Calculator</h2>
             <div class="input-group">
-                <label>Total Volume:</label>
-                <input type="number" inputmode="decimal" id="totalVolume" placeholder="m³">
+                <label>Water Volume (bbl):</label>
+                <input type="number" id="waterVol" placeholder="Barrels" inputmode="decimal">
             </div>
             <div class="input-group">
-                <label>Oil Volume:</label>
-                <input type="number" inputmode="decimal" id="oilVolume" placeholder="m³">
+                <label>Water Salinity (ppm):</label>
+                <input type="number" id="waterSalinity" placeholder="ppm" inputmode="decimal">
             </div>
             <div class="input-group">
-                <label>Total Salinity:</label>
-                <input type="number" inputmode="decimal" id="totalSalinity" placeholder="ppm">
+                <label>Oil Volume (bbl):</label>
+                <input type="number" id="oilVol" placeholder="Barrels" inputmode="decimal">
             </div>
-            <button onclick="calculateDualPhase()">Calculate</button>
-            <div id="dualPhaseResult" class="result"></div>
+            <div class="input-group">
+                <label>Target Salinity (ppm):</label>
+                <input type="number" id="targetSalinity" placeholder="ppm" inputmode="decimal">
+            </div>
+            <button onclick="calculateSalinity()">Calculate</button>
+            <div class="note">
+                Calculates either:
+                <ul>
+                    <li>Required fresh water volume to dilute to target salinity</li>
+                    <li>Resulting salinity after adding oil/water</li>
+                </ul>
+                Note: Leave target salinity blank to calculate current system salinity
+            </div>
+            <div id="salinityResult" class="result"></div>
         </div>
     </div>
 
@@ -215,8 +234,8 @@
                 updateFlowLabels();
             } else if (value === 'drill') {
                 document.getElementById('drillCalc').classList.add('active');
-            } else if (value === 'dualPhase') {
-                document.getElementById('dualPhaseCalc').classList.add('active');
+            } else if (value === 'salinity') {
+                document.getElementById('salinityCalc').classList.add('active');
             }
         });
 
@@ -298,31 +317,43 @@
             showResult('drillResult', `Annular Volume: ${volume.toFixed(2)} cubic inches`);
         }
 
-        // Dual-Phase System Calculation
-        function calculateDualPhase() {
-            const totalVolume = parseFloat(document.getElementById('totalVolume').value);
-            const oilVolume = parseFloat(document.getElementById('oilVolume').value);
-            const totalSalinity = parseFloat(document.getElementById('totalSalinity').value);
+        // Salinity Calculation
+        function calculateSalinity() {
+            const waterVol = parseFloat(document.getElementById('waterVol').value) || 0;
+            const waterSalinity = parseFloat(document.getElementById('waterSalinity').value) || 0;
+            const oilVol = parseFloat(document.getElementById('oilVol').value) || 0;
+            const targetSalinity = parseFloat(document.getElementById('targetSalinity').value);
 
-            if (!totalVolume || !oilVolume || !totalSalinity) {
-                showError('dualPhaseResult', 'Please fill all fields');
-                return;
+            if (targetSalinity) {
+                if (waterSalinity <= targetSalinity) {
+                    showError('salinityResult', 'Target salinity must be lower than current water salinity');
+                    return;
+                }
+                if (waterVol <= 0) {
+                    showError('salinityResult', 'Water volume must be positive');
+                    return;
+                }
+                const freshWaterNeeded = (waterVol * (waterSalinity - targetSalinity)) / targetSalinity;
+                showResult('salinityResult', 
+                    `Required fresh water: ${freshWaterNeeded.toFixed(2)} bbl\n` +
+                    `Total liquid volume: ${(waterVol + oilVol + freshWaterNeeded).toFixed(2)} bbl`);
+            } else {
+                if (waterVol === 0) {
+                    showError('salinityResult', 'Water volume cannot be zero');
+                    return;
+                }
+                const currentSalinity = waterSalinity;
+                showResult('salinityResult', 
+                    `Current water salinity: ${currentSalinity.toFixed(2)} ppm\n` +
+                    `Oil/Water Ratio: ${(oilVol/waterVol).toFixed(2)}:1`);
             }
-
-            const waterVolume = totalVolume - oilVolume;
-            if (waterVolume <= 0) {
-                showError('dualPhaseResult', 'Water volume must be greater than 0');
-                return;
-            }
-
-            const waterPhaseSalinity = (totalSalinity * totalVolume) / waterVolume;
-            showResult('dualPhaseResult', `Water Phase Salinity: ${waterPhaseSalinity.toFixed(2)} ppm`);
         }
 
         // Helper functions
         function showResult(elementId, message) {
             const element = document.getElementById(elementId);
             element.textContent = message;
+            element.style.color = '#333';
             element.style.display = 'block';
         }
 

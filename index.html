@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drilling Calculations</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .calculator {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .calculator.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+            display: none;
+        }
+
+        @media (min-width: 600px) {
+            .input-group {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            label {
+                flex: 1;
+                margin-bottom: 0;
+            }
+
+            input, select {
+                flex: 2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Drilling Calculations</h1>
+        
+        <select id="calculationType" class="calc-select">
+            <option value="">Select Calculation Type</option>
+            <option value="density">Density Adjustment</option>
+            <option value="flow">Flow Rate</option>
+            <option value="drill">Drill Flow Volume</option>
+        </select>
+
+        <!-- Density Calculator -->
+        <div id="densityCalc" class="calculator">
+            <h2>Density Adjustment Calculator</h2>
+            <div class="input-group">
+                <label>Original Volume:</label>
+                <input type="number" id="originalVolume" placeholder="m³">
+            </div>
+            <div class="input-group">
+                <label>Original Density:</label>
+                <input type="number" id="originalDensity" placeholder="kg/m³">
+            </div>
+            <div class="input-group">
+                <label>Desired Density:</label>
+                <input type="number" id="desiredDensity" placeholder="kg/m³">
+            </div>
+            <div class="input-group">
+                <label>Additive Density:</label>
+                <input type="number" id="additiveDensity" placeholder="kg/m³">
+            </div>
+            <button onclick="calculateDensity()">Calculate</button>
+            <div id="densityResult" class="result"></div>
+        </div>
+
+        <!-- Flow Rate Calculator -->
+        <div id="flowCalc" class="calculator">
+            <h2>Flow Rate Calculator</h2>
+            <div class="input-group">
+                <label>Calculate:</label>
+                <select id="flowVariable">
+                    <option value="flowRate">Flow Rate</option>
+                    <option value="volume">Volume</option>
+                    <option value="time">Time</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label id="flowInput1Label">Flow Rate:</label>
+                <input type="number" id="flowInput1" placeholder="m³/min">
+            </div>
+            <div class="input-group">
+                <label id="flowInput2Label">Volume:</label>
+                <input type="number" id="flowInput2" placeholder="m³">
+            </div>
+            <div class="input-group">
+                <label id="flowInput3Label">Time:</label>
+                <input type="number" id="flowInput3" placeholder="minutes">
+            </div>
+            <button onclick="calculateFlow()">Calculate</button>
+            <div id="flowResult" class="result"></div>
+        </div>
+
+        <!-- Drill Flow Volume Calculator -->
+        <div id="drillCalc" class="calculator">
+            <h2>Drill Flow Volume Calculator</h2>
+            <div class="input-group">
+                <label>Hole Diameter:</label>
+                <input type="number" id="holeDiameter" placeholder="inches">
+            </div>
+            <div class="input-group">
+                <label>Pipe Diameter:</label>
+                <input type="number" id="pipeDiameter" placeholder="inches">
+            </div>
+            <div class="input-group">
+                <label>Length:</label>
+                <input type="number" id="length" placeholder="feet">
+            </div>
+            <button onclick="calculateDrill()">Calculate</button>
+            <div id="drillResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Show/hide calculators based on selection
+        document.getElementById('calculationType').addEventListener('change', function() {
+            const calculators = document.querySelectorAll('.calculator');
+            calculators.forEach(calc => calc.classList.remove('active'));
+            
+            const value = this.value;
+            if (value === 'density') {
+                document.getElementById('densityCalc').classList.add('active');
+            } else if (value === 'flow') {
+                document.getElementById('flowCalc').classList.add('active');
+                updateFlowLabels();
+            } else if (value === 'drill') {
+                document.getElementById('drillCalc').classList.add('active');
+            }
+        });
+
+        // Density Calculation
+        function calculateDensity() {
+            const V1 = parseFloat(document.getElementById('originalVolume').value);
+            const D1 = parseFloat(document.getElementById('originalDensity').value);
+            const D2 = parseFloat(document.getElementById('desiredDensity').value);
+            const Da = parseFloat(document.getElementById('additiveDensity').value);
+
+            if (!V1 || !D1 || !D2 || !Da) {
+                showError('densityResult', 'Please fill all fields');
+                return;
+            }
+
+            if (Da === D2) {
+                showError('densityResult', 'Additive density cannot equal desired density');
+                return;
+            }
+
+            const Vadd = (V1 * (D2 - D1)) / (Da - D2);
+            showResult('densityResult', `Required additive volume: ${Vadd.toFixed(2)} m³`);
+        }
+
+        // Flow Rate Calculation
+        function updateFlowLabels() {
+            const variable = document.getElementById('flowVariable').value;
+            const labels = document.querySelectorAll('#flowCalc label[id^="flowInput"]');
+            
+            if (variable === 'flowRate') {
+                labels[0].textContent = 'Volume (m³):';
+                labels[1].textContent = 'Time (minutes):';
+                labels[2].style.display = 'none';
+            } else if (variable === 'volume') {
+                labels[0].textContent = 'Flow Rate (m³/min):';
+                labels[1].textContent = 'Time (minutes):';
+                labels[2].style.display = 'none';
+            } else {
+                labels[0].textContent = 'Flow Rate (m³/min):';
+                labels[1].textContent = 'Volume (m³):';
+                labels[2].style.display = 'none';
+            }
+        }
+
+        function calculateFlow() {
+            const variable = document.getElementById('flowVariable').value;
+            let result;
+
+            if (variable === 'flowRate') {
+                const V = parseFloat(document.getElementById('flowInput1').value);
+                const t = parseFloat(document.getElementById('flowInput2').value);
+                result = V / t;
+                showResult('flowResult', `Flow Rate: ${result.toFixed(2)} m³/min`);
+            } else if (variable === 'volume') {
+                const Q = parseFloat(document.getElementById('flowInput1').value);
+                const t = parseFloat(document.getElementById('flowInput2').value);
+                result = Q * t;
+                showResult('flowResult', `Volume: ${result.toFixed(2)} m³`);
+            } else {
+                const Q = parseFloat(document.getElementById('flowInput1').value);
+                const V = parseFloat(document.getElementById('flowInput2').value);
+                result = V / Q;
+                showResult('flowResult', `Time: ${result.toFixed(2)} minutes`);
+            }
+        }
+
+        // Drill Flow Volume Calculation
+        function calculateDrill() {
+            const hole = parseFloat(document.getElementById('holeDiameter').value);
+            const pipe = parseFloat(document.getElementById('pipeDiameter').value);
+            const length = parseFloat(document.getElementById('length').value);
+
+            if (!hole || !pipe || !length) {
+                showError('drillResult', 'Please fill all fields');
+                return;
+            }
+
+            const volume = (Math.PI/4) * (Math.pow(hole, 2) - Math.pow(pipe, 2)) * length;
+            showResult('drillResult', `Annular Volume: ${volume.toFixed(2)} cubic inches`);
+        }
+
+        // Helper functions
+        function showResult(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.color = 'red';
+            element.style.display = 'block';
+        }
+
+        // Initialize flow calculator labels
+        document.getElementById('flowVariable').addEventListener('change', updateFlowLabels);
+    </script>
+</body>
+</html>

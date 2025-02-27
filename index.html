@@ -109,6 +109,7 @@
             <option value="density">Density Adjustment</option>
             <option value="flow">Flow Rate</option>
             <option value="drill">Drill Flow Volume</option>
+            <option value="dualPhase">Dual-Phase System (Water Phase Salinity)</option>
         </select>
 
         <!-- Density Calculator -->
@@ -179,6 +180,25 @@
             <button onclick="calculateDrill()">Calculate</button>
             <div id="drillResult" class="result"></div>
         </div>
+
+        <!-- Dual-Phase System Calculator -->
+        <div id="dualPhaseCalc" class="calculator">
+            <h2>Dual-Phase System Calculator</h2>
+            <div class="input-group">
+                <label>Total Volume:</label>
+                <input type="number" id="totalVolume" placeholder="m³">
+            </div>
+            <div class="input-group">
+                <label>Oil Volume:</label>
+                <input type="number" id="oilVolume" placeholder="m³">
+            </div>
+            <div class="input-group">
+                <label>Total Salinity:</label>
+                <input type="number" id="totalSalinity" placeholder="ppm">
+            </div>
+            <button onclick="calculateDualPhase()">Calculate</button>
+            <div id="dualPhaseResult" class="result"></div>
+        </div>
     </div>
 
     <script>
@@ -195,6 +215,8 @@
                 updateFlowLabels();
             } else if (value === 'drill') {
                 document.getElementById('drillCalc').classList.add('active');
+            } else if (value === 'dualPhase') {
+                document.getElementById('dualPhaseCalc').classList.add('active');
             }
         });
 
@@ -274,6 +296,27 @@
 
             const volume = (Math.PI/4) * (Math.pow(hole, 2) - Math.pow(pipe, 2)) * length;
             showResult('drillResult', `Annular Volume: ${volume.toFixed(2)} cubic inches`);
+        }
+
+        // Dual-Phase System Calculation
+        function calculateDualPhase() {
+            const totalVolume = parseFloat(document.getElementById('totalVolume').value);
+            const oilVolume = parseFloat(document.getElementById('oilVolume').value);
+            const totalSalinity = parseFloat(document.getElementById('totalSalinity').value);
+
+            if (!totalVolume || !oilVolume || !totalSalinity) {
+                showError('dualPhaseResult', 'Please fill all fields');
+                return;
+            }
+
+            const waterVolume = totalVolume - oilVolume;
+            if (waterVolume <= 0) {
+                showError('dualPhaseResult', 'Water volume must be greater than 0');
+                return;
+            }
+
+            const waterPhaseSalinity = (totalSalinity * totalVolume) / waterVolume;
+            showResult('dualPhaseResult', `Water Phase Salinity: ${waterPhaseSalinity.toFixed(2)} ppm`);
         }
 
         // Helper functions

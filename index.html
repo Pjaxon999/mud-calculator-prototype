@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drilling Calculations</title>
+    <title>Drilling Engineering Calculator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -83,6 +83,11 @@
             white-space: pre-wrap;
         }
 
+        .warning {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
         .note {
             font-size: 0.9em;
             color: #666;
@@ -109,34 +114,34 @@
 </head>
 <body>
     <div class="container">
-        <h1>Drilling Calculations</h1>
+        <h1>Drilling Engineering Calculator</h1>
         
         <select id="calculationType" class="calc-select">
             <option value="">Select Calculation Type</option>
             <option value="density">Density Adjustment</option>
             <option value="flow">Flow Rate</option>
             <option value="drill">Drill Flow Volume</option>
-            <option value="salinity">Oil-Water Phase Salinity</option>
+            <option value="salinity">Water Phase Salinity (API 13B-2)</option>
         </select>
 
         <!-- Density Calculator -->
         <div id="densityCalc" class="calculator">
             <h2>Density Adjustment Calculator</h2>
             <div class="input-group">
-                <label>Original Volume:</label>
-                <input type="number" id="originalVolume" placeholder="m³" inputmode="decimal">
+                <label>Original Volume (m³):</label>
+                <input type="number" id="originalVolume" inputmode="decimal">
             </div>
             <div class="input-group">
-                <label>Original Density:</label>
-                <input type="number" id="originalDensity" placeholder="kg/m³" inputmode="decimal">
+                <label>Original Density (kg/m³):</label>
+                <input type="number" id="originalDensity" inputmode="decimal">
             </div>
             <div class="input-group">
-                <label>Desired Density:</label>
-                <input type="number" id="desiredDensity" placeholder="kg/m³" inputmode="decimal">
+                <label>Desired Density (kg/m³):</label>
+                <input type="number" id="desiredDensity" inputmode="decimal">
             </div>
             <div class="input-group">
-                <label>Additive Density:</label>
-                <input type="number" id="additiveDensity" placeholder="kg/m³" inputmode="decimal">
+                <label>Additive Density (kg/m³):</label>
+                <input type="number" id="additiveDensity" inputmode="decimal">
             </div>
             <button onclick="calculateDensity()">Calculate</button>
             <div id="densityResult" class="result"></div>
@@ -154,16 +159,16 @@
                 </select>
             </div>
             <div class="input-group">
-                <label id="flowInput1Label">Flow Rate:</label>
-                <input type="number" id="flowInput1" placeholder="m³/min" inputmode="decimal">
+                <label id="flowInput1Label">Flow Rate (m³/min):</label>
+                <input type="number" id="flowInput1" inputmode="decimal">
             </div>
             <div class="input-group">
-                <label id="flowInput2Label">Volume:</label>
-                <input type="number" id="flowInput2" placeholder="m³" inputmode="decimal">
+                <label id="flowInput2Label">Volume (m³):</label>
+                <input type="number" id="flowInput2" inputmode="decimal">
             </div>
             <div class="input-group">
-                <label id="flowInput3Label">Time:</label>
-                <input type="number" id="flowInput3" placeholder="minutes" inputmode="decimal">
+                <label id="flowInput3Label">Time (min):</label>
+                <input type="number" id="flowInput3" inputmode="decimal">
             </div>
             <button onclick="calculateFlow()">Calculate</button>
             <div id="flowResult" class="result"></div>
@@ -173,69 +178,68 @@
         <div id="drillCalc" class="calculator">
             <h2>Drill Flow Volume Calculator</h2>
             <div class="input-group">
-                <label>Hole Diameter:</label>
-                <input type="number" id="holeDiameter" placeholder="inches" inputmode="decimal">
+                <label>Hole Diameter (in):</label>
+                <input type="number" id="holeDiameter" inputmode="decimal">
             </div>
             <div class="input-group">
-                <label>Pipe Diameter:</label>
-                <input type="number" id="pipeDiameter" placeholder="inches" inputmode="decimal">
+                <label>Pipe Diameter (in):</label>
+                <input type="number" id="pipeDiameter" inputmode="decimal">
             </div>
             <div class="input-group">
-                <label>Length:</label>
-                <input type="number" id="length" placeholder="feet" inputmode="decimal">
+                <label>Length (ft):</label>
+                <input type="number" id="length" inputmode="decimal">
             </div>
             <button onclick="calculateDrill()">Calculate</button>
             <div id="drillResult" class="result"></div>
         </div>
 
-        <!-- Oil-Water Salinity Calculator -->
+        <!-- API 13B-2 Water Phase Salinity Calculator -->
         <div id="salinityCalc" class="calculator">
-            <h2>Oil-Water Phase Salinity Calculator</h2>
+            <h2>Water Phase Salinity Calculator (API 13B-2)</h2>
             <div class="input-group">
-                <label>Water Volume (bbl):</label>
-                <input type="number" id="waterVol" placeholder="Barrels" inputmode="decimal">
+                <label>Water Percentage (%):</label>
+                <input type="number" id="waterPct" inputmode="decimal" step="0.1">
             </div>
             <div class="input-group">
-                <label>Water Salinity (ppm):</label>
-                <input type="number" id="waterSalinity" placeholder="ppm" inputmode="decimal">
+                <label>Oil Percentage (%):</label>
+                <input type="number" id="oilPct" inputmode="decimal" step="0.1">
             </div>
             <div class="input-group">
-                <label>Oil Volume (bbl):</label>
-                <input type="number" id="oilVol" placeholder="Barrels" inputmode="decimal">
+                <label>Whole Mud Chloride (mg/L):</label>
+                <input type="number" id="chloride" inputmode="decimal">
             </div>
             <div class="input-group">
-                <label>Target Salinity (ppm):</label>
-                <input type="number" id="targetSalinity" placeholder="ppm" inputmode="decimal">
+                <label>Whole Mud Calcium (mg/L):</label>
+                <input type="number" id="calcium" inputmode="decimal">
             </div>
             <button onclick="calculateSalinity()">Calculate</button>
             <div class="note">
-                Calculates either:
-                <ul>
-                    <li>Required fresh water volume to dilute to target salinity</li>
-                    <li>Resulting salinity after adding oil/water</li>
-                </ul>
-                Note: Leave target salinity blank to calculate current system salinity
+                All values must be entered. Percentages must sum to 100%.
             </div>
             <div id="salinityResult" class="result"></div>
         </div>
     </div>
 
     <script>
-        // Show/hide calculators based on selection
+        // Show/hide calculators
         document.getElementById('calculationType').addEventListener('change', function() {
             const calculators = document.querySelectorAll('.calculator');
             calculators.forEach(calc => calc.classList.remove('active'));
             
-            const value = this.value;
-            if (value === 'density') {
-                document.getElementById('densityCalc').classList.add('active');
-            } else if (value === 'flow') {
-                document.getElementById('flowCalc').classList.add('active');
-                updateFlowLabels();
-            } else if (value === 'drill') {
-                document.getElementById('drillCalc').classList.add('active');
-            } else if (value === 'salinity') {
-                document.getElementById('salinityCalc').classList.add('active');
+            switch(this.value) {
+                case 'density':
+                    document.getElementById('densityCalc').classList.add('active');
+                    break;
+                case 'flow':
+                    document.getElementById('flowCalc').classList.add('active');
+                    updateFlowLabels();
+                    break;
+                case 'drill':
+                    document.getElementById('drillCalc').classList.add('active');
+                    break;
+                case 'salinity':
+                    document.getElementById('salinityCalc').classList.add('active');
+                    break;
             }
         });
 
@@ -247,12 +251,7 @@
             const Da = parseFloat(document.getElementById('additiveDensity').value);
 
             if (!V1 || !D1 || !D2 || !Da) {
-                showError('densityResult', 'Please fill all fields');
-                return;
-            }
-
-            if (Da === D2) {
-                showError('densityResult', 'Additive density cannot equal desired density');
+                showError('densityResult', 'All fields are required');
                 return;
             }
 
@@ -265,51 +264,41 @@
             const variable = document.getElementById('flowVariable').value;
             const labels = document.querySelectorAll('#flowCalc label[id^="flowInput"]');
             
-            if (variable === 'flowRate') {
-                labels[0].textContent = 'Volume (m³):';
-                labels[1].textContent = 'Time (minutes):';
-                labels[2].style.display = 'none';
-            } else if (variable === 'volume') {
-                labels[0].textContent = 'Flow Rate (m³/min):';
-                labels[1].textContent = 'Time (minutes):';
-                labels[2].style.display = 'none';
-            } else {
-                labels[0].textContent = 'Flow Rate (m³/min):';
-                labels[1].textContent = 'Volume (m³):';
-                labels[2].style.display = 'none';
-            }
+            labels[0].textContent = variable === 'flowRate' ? 'Volume (m³):' : 'Flow Rate (m³/min):';
+            labels[1].textContent = variable === 'time' ? 'Volume (m³):' : 'Time (min):';
+            labels[2].style.display = 'none';
         }
 
         function calculateFlow() {
             const variable = document.getElementById('flowVariable').value;
-            let result;
+            const input1 = parseFloat(document.getElementById('flowInput1').value);
+            const input2 = parseFloat(document.getElementById('flowInput2').value);
 
-            if (variable === 'flowRate') {
-                const V = parseFloat(document.getElementById('flowInput1').value);
-                const t = parseFloat(document.getElementById('flowInput2').value);
-                result = V / t;
-                showResult('flowResult', `Flow Rate: ${result.toFixed(2)} m³/min`);
-            } else if (variable === 'volume') {
-                const Q = parseFloat(document.getElementById('flowInput1').value);
-                const t = parseFloat(document.getElementById('flowInput2').value);
-                result = Q * t;
-                showResult('flowResult', `Volume: ${result.toFixed(2)} m³`);
-            } else {
-                const Q = parseFloat(document.getElementById('flowInput1').value);
-                const V = parseFloat(document.getElementById('flowInput2').value);
-                result = V / Q;
-                showResult('flowResult', `Time: ${result.toFixed(2)} minutes`);
+            let result;
+            switch(variable) {
+                case 'flowRate':
+                    result = input1 / input2;
+                    showResult('flowResult', `Flow Rate: ${result.toFixed(2)} m³/min`);
+                    break;
+                case 'volume':
+                    result = input1 * input2;
+                    showResult('flowResult', `Volume: ${result.toFixed(2)} m³`);
+                    break;
+                case 'time':
+                    result = input2 / input1;
+                    showResult('flowResult', `Time: ${result.toFixed(2)} minutes`);
+                    break;
             }
         }
 
-        // Drill Flow Volume Calculation
+        // Drill Volume Calculation
         function calculateDrill() {
             const hole = parseFloat(document.getElementById('holeDiameter').value);
             const pipe = parseFloat(document.getElementById('pipeDiameter').value);
             const length = parseFloat(document.getElementById('length').value);
 
             if (!hole || !pipe || !length) {
-                showError('drillResult', 'Please fill all fields');
+                showError('drillResult', 'All fields are required');
                 return;
             }
 
@@ -317,35 +306,61 @@
             showResult('drillResult', `Annular Volume: ${volume.toFixed(2)} cubic inches`);
         }
 
-        // Salinity Calculation
+        // API 13B-2 Salinity Calculation
         function calculateSalinity() {
-            const waterVol = parseFloat(document.getElementById('waterVol').value) || 0;
-            const waterSalinity = parseFloat(document.getElementById('waterSalinity').value) || 0;
-            const oilVol = parseFloat(document.getElementById('oilVol').value) || 0;
-            const targetSalinity = parseFloat(document.getElementById('targetSalinity').value);
+            const waterPct = parseFloat(document.getElementById('waterPct').value);
+            const oilPct = parseFloat(document.getElementById('oilPct').value);
+            const chloride = parseFloat(document.getElementById('chloride').value);
+            const calcium = parseFloat(document.getElementById('calcium').value);
 
-            if (targetSalinity) {
-                if (waterSalinity <= targetSalinity) {
-                    showError('salinityResult', 'Target salinity must be lower than current water salinity');
-                    return;
+            // Validation
+            if ([waterPct, oilPct, chloride, calcium].some(v => isNaN(v))) {
+                showError('salinityResult', 'All fields are required');
+                return;
+            }
+
+            if (Math.abs(waterPct + oilPct - 100) > 0.1) {
+                showError('salinityResult', 'Water + Oil percentages must equal 100%');
+                return;
+            }
+
+            // API Calculations
+            const clCaCl2 = calcium * 1.769;  // Eq 33
+            const clNaCl = chloride - clCaCl2; // Eq 34
+            
+            let cCaCl2, cNaCl = 0, isSupersaturated = false;
+            
+            if (clNaCl > 0) {
+                cCaCl2 = calcium * 2.769;    // Eq 38
+                cNaCl = clNaCl * 1.648;       // Eq 41
+                
+                // Check supersaturation
+                const phiW = waterPct;
+                const denominator = (cCaCl2 + cNaCl) + (10000 * (100 - phiW));
+                let wCaCl2 = (cCaCl2 * 10000) / denominator; // Eq 44
+                let wNaCl = (cNaCl * 10000) / denominator;   // Eq 45
+                
+                // Eq 46 approximation
+                const wNaClMax = (-26.432 + Math.sqrt(26.432**2 - 4*7.98191e-3*(5.2238e-5 - wCaCl2))) 
+                              / (2*7.98191e-3);
+
+                if (wNaCl > wNaClMax) {
+                    isSupersaturated = true;
+                    const cCaAq = (calcium * 100) / phiW;  // Eq 47
+                    wCaCl2 = 2.4708e-10*cCaAq**2 - 2.2567e-4*cCaAq + 0.21348; // Eq 48
+                    wNaCl = wNaClMax;
                 }
-                if (waterVol <= 0) {
-                    showError('salinityResult', 'Water volume must be positive');
-                    return;
+                
+                const wps = (wNaCl + wCaCl2) * 10000;  // Eq 49
+                let output = `Water Phase Salinity: ${wps.toFixed(0)} ppm`;
+                if (isSupersaturated) {
+                    output += `\nWarning: Supersaturated solution - insoluble NaCl present`;
                 }
-                const freshWaterNeeded = (waterVol * (waterSalinity - targetSalinity)) / targetSalinity;
-                showResult('salinityResult', 
-                    `Required fresh water: ${freshWaterNeeded.toFixed(2)} bbl\n` +
-                    `Total liquid volume: ${(waterVol + oilVol + freshWaterNeeded).toFixed(2)} bbl`);
+                showResult('salinityResult', output);
             } else {
-                if (waterVol === 0) {
-                    showError('salinityResult', 'Water volume cannot be zero');
-                    return;
-                }
-                const currentSalinity = waterSalinity;
-                showResult('salinityResult', 
-                    `Current water salinity: ${currentSalinity.toFixed(2)} ppm\n` +
-                    `Oil/Water Ratio: ${(oilVol/waterVol).toFixed(2)}:1`);
+                cCaCl2 = chloride * 1.565;    // Eq 35
+                const wps = (cCaCl2 / (waterPct/100)).toFixed(0);
+                showResult('salinityResult', `Water Phase Salinity: ${wps} ppm`);
             }
         }
 
@@ -353,18 +368,17 @@
         function showResult(elementId, message) {
             const element = document.getElementById(elementId);
             element.textContent = message;
-            element.style.color = '#333';
             element.style.display = 'block';
         }
 
         function showError(elementId, message) {
             const element = document.getElementById(elementId);
             element.textContent = message;
-            element.style.color = 'red';
+            element.style.color = '#dc3545';
             element.style.display = 'block';
         }
 
-        // Initialize flow calculator labels
+        // Initialize flow calculator
         document.getElementById('flowVariable').addEventListener('change', updateFlowLabels);
     </script>
 </body>
